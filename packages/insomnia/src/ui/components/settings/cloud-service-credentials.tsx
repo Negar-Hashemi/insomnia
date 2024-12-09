@@ -138,6 +138,14 @@ export const CloudServiceCredentialList = () => {
                   </td>
                   <td className='w-52 whitespace-nowrap'>
                     <div className='flex gap-2'>
+                      {provider === 'aws' &&
+                        <Button
+                          className={`${buttonClassName} w-16`}
+                          onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
+                        >
+                          <Icon icon="edit" />&nbsp;&nbsp;Edit
+                        </Button>
+                      }
                       <Button
                         className={`${buttonClassName} w-20`}
                         onPress={() => handleDeleteItem(_id, name)}
