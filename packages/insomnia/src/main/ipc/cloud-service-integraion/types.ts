@@ -9,7 +9,8 @@ export interface CloudServiceResult<T extends Record<string, any>> {
 }
 export interface ICloudService {
   authenticate(...args: any[]): Promise<any>;
-  getSecret(secretName: string, config: any): Promise<any>;
+  getSecret<T extends {}>(secretName: string, config?: T): Promise<any>;
+  getSecret(secretName: string): Promise<any>;
   getUniqueCacheKey<T extends {} = {}>(secretName: string, config?: T): string;
 }
 
