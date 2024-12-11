@@ -12,7 +12,7 @@ export interface AWSTemporaryCredential {
   sessionToken: string;
   region: string;
 }
-interface IBaseCloudCredential {
+export interface IBaseCloudCredential {
   name: string;
   provider: CloudProviderName;
 }
@@ -21,7 +21,11 @@ export interface AWSCloudCredential extends IBaseCloudCredential {
   provider: 'aws';
   credentials: AWSTemporaryCredential;
 }
-export type BaseCloudCredential = AWSCloudCredential;
+export interface GCPCloudCredential extends IBaseCloudCredential {
+  provider: 'gcp';
+  credentials: string;
+}
+export type BaseCloudCredential = AWSCloudCredential | GCPCloudCredential;
 export type CloudProviderCredential = BaseModel & BaseCloudCredential;
 
 export const name = 'Cloud Credential';
