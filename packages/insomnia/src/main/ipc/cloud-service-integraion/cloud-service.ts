@@ -1,5 +1,3 @@
-import type { JWTInput } from 'google-auth-library';
-
 import * as models from '../../../models';
 import type { AWSTemporaryCredential, BaseCloudCredential, CloudProviderName } from '../../../models/cloud-credential';
 import { ipcMainHandle, ipcMainOn } from '../electron';
@@ -45,7 +43,7 @@ class ServiceFactory {
       case 'aws':
         return new AWSService(credential as AWSTemporaryCredential);
       case 'gcp':
-        return new GCPService(credential as JWTInput);
+        return new GCPService(credential as string);
       default:
         throw new Error('Invalid cloud service provider name');
     }
