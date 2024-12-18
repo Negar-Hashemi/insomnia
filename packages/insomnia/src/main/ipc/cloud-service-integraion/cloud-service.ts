@@ -3,7 +3,9 @@ import type { AWSTemporaryCredential, BaseCloudCredential, CloudProviderName } f
 import { ipcMainHandle, ipcMainOn } from '../electron';
 import { type AWSGetSecretConfig, AWSService } from './aws-service';
 import { AzureService } from './azure-service';
-import { type GCPGetSecretConfig } from './gcp-servcie';
+import { type GCPGetSecretConfig, GCPService } from './gcp-servcie';
+import { type HashiCorpCredentialType, HashiCorpService } from './hashicorp-service';
+import type { HashiCorpSecretConfig } from './types';
 import { type MaxAgeUnit, VaultCache } from './vault-cache';
 
 // in-memory cache for fetched vault secrets
@@ -25,7 +27,7 @@ export interface CloudServiceSecretOption<T extends {}> extends CloudServiceAuth
   secretId: string;
   config: T;
 }
-export type CloudServiceGetSecretConfig = AWSGetSecretConfig | GCPGetSecretConfig;
+export type CloudServiceGetSecretConfig = AWSGetSecretConfig | GCPGetSecretConfig | HashiCorpSecretConfig;
 
 export function registerCloudServiceHandlers() {
   ipcMainHandle('cloudService.authenticate', (_event, options) => cspAuthentication(options));
@@ -42,6 +44,10 @@ class ServiceFactory {
     switch (name) {
       case 'aws':
         return new AWSService(credential as AWSTemporaryCredential);
+      case 'gcp':
+        return new GCPService(credential as string);
+      case 'hashicorp':
+        return new HashiCorpService(credential as HashiCorpCredentialType);
       default:
         throw new Error('Invalid cloud service provider name');
     }
