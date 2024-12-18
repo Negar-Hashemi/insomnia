@@ -9,6 +9,7 @@ import { Icon } from '../icon';
 import { showModal } from '../modals';
 import { AskModal } from '../modals/ask-modal';
 import { CloudCredentialModal } from '../modals/cloud-credential-modal/cloud-credential-modal';
+import { SvgIcon } from '../svg-icon';
 import { UpgradeNotice } from '../upgrade-notice';
 import { NumberSetting } from './number-setting';
 
@@ -22,6 +23,16 @@ const createCredentialItemList: createCredentialItemType[] = [
     id: 'aws',
     name: getProviderDisplayName('aws'),
     icon: <i className="ml-1 fa-brands fa-aws" />,
+  },
+  {
+    id: 'gcp',
+    name: getProviderDisplayName('gcp'),
+    icon: <SvgIcon icon='gcp-logo' className='ml-1' />,
+  },
+  {
+    id: 'hashicorp',
+    name: getProviderDisplayName('hashicorp'),
+    icon: <SvgIcon icon='hashicorp' className='ml-1' />,
   },
 ];
 const buttonClassName = 'disabled:opacity-50 h-7 aspect-square aria-pressed:bg-[--hl-sm] rounded-sm text-[--color-font] hover:bg-[--hl-xs] transition-all text-sm py-1 px-2';

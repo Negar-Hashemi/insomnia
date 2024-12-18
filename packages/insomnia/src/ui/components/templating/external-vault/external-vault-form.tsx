@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Button } from 'react-aria-components';
 
 import { debounce } from '../../../../common/misc';
-import type { AWSSecretConfig, ExternalVaultConfig } from '../../../../main/ipc/cloud-service-integraion/types';
+import type { AWSSecretConfig, ExternalVaultConfig, GCPSecretConfig, HashiCorpSecretConfig } from '../../../../main/ipc/cloud-service-integraion/types';
 import { type CloudProviderCredential, type CloudProviderName, type } from '../../../../models/cloud-credential';
 import { Icon } from '../../icon';
 import { CloudCredentialModal } from '../../modals/cloud-credential-modal/cloud-credential-modal';
 import type { ArgConfigFormProps } from '../tag-editor-arg-sub-form';
 import { AWSSecretManagerForm } from './aws-secret-manager-form';
+import { GCPSecretManagerForm } from './gcp-secret-manager-form';
+import { HashiCorpVaultForm } from './hashicorp-vault-form';
 
 export const ExternalVaultForm = (props: ArgConfigFormProps) => {
   const { onChange, configValue, activeTagData, docs } = props;
@@ -29,6 +31,24 @@ export const ExternalVaultForm = (props: ArgConfigFormProps) => {
       SubForm = (
         <AWSSecretManagerForm
           formData={formData as AWSSecretConfig}
+          onChange={handleFormChange}
+          activeTagData={activeTagData}
+        />
+      );
+      break;
+    case 'gcp':
+      SubForm = (
+        <GCPSecretManagerForm
+          formData={formData as GCPSecretConfig}
+          onChange={handleFormChange}
+          activeTagData={activeTagData}
+        />
+      );
+      break;
+    case 'hashicorp':
+      SubForm = (
+        <HashiCorpVaultForm
+          formData={formData as HashiCorpSecretConfig}
           onChange={handleFormChange}
           activeTagData={activeTagData}
         />
