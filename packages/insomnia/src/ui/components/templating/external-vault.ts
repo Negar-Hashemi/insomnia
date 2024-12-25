@@ -57,7 +57,7 @@ export const getAWSSecret = async (secretConfig: AWSSecretConfig, providerCreden
 export const getGCPSecret = async (secretConfig: GCPSecretConfig, providerCredential: CloudProviderCredential) => {
   const { secretName, version } = secretConfig;
   if (!secretName) {
-    throw new Error('Secret Name is required');
+    throw new Error('Get secret from GCP failed: Secret Name is required');
   }
   const getSecretOption: CloudServiceSecretOption<GCPGetSecretConfig> = {
     provider: 'gcp',
@@ -70,6 +70,6 @@ export const getGCPSecret = async (secretConfig: GCPSecretConfig, providerCreden
   if (success && result) {
     return result.value;
   } else {
-    throw new Error(error?.errorMessage);
+    throw new Error(`Get secret from GCP failed: ${error?.errorMessage}`);
   }
 };
