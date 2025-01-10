@@ -35,7 +35,8 @@ export type HandleChannels =
   | 'secretStorage.encryptString'
   | 'secretStorage.decryptString'
   | 'cloudService.authenticate'
-  | 'cloudService.getSecret';
+  | 'cloudService.getSecret'
+  | 'cloudService.exchangeCode';
 
 export const ipcMainHandle = (
   channel: HandleChannels,
@@ -79,7 +80,8 @@ export type MainOnChannels =
   | 'updateLatestStepName'
   | 'startExecution'
   | 'cloudService.setCacheMaxAge'
-  | 'cloudService.clearCache';
+  | 'cloudService.clearCache'
+  | 'cloudService.openAuthUrl';
 export type RendererOnChannels =
   'clear-all-models'
   | 'clear-model'

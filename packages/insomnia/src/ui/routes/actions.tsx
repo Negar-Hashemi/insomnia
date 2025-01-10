@@ -1502,7 +1502,7 @@ export const updateCloudCredentialAction: ActionFunction = async ({ request, par
   invariant(provider, 'Cloud Provier name is required');
   if (name && provider && credentials) {
     const authenciateResponse = await window.main.cloudService.authenticate({ provider, credentials });
-    const { success, error, result } = authenciateResponse;
+    const { success, error, result } = authenciateResponse!;
     if (success) {
       const originCredential = await models.cloudCrendential.getById(cloudCredentialId);
       invariant(originCredential, 'No Cloud Credential found');
