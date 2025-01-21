@@ -144,7 +144,7 @@ export const CloudServiceCredentialList = () => {
                   </td>
                   <td className='w-52 whitespace-nowrap'>
                     <div className='flex gap-2'>
-                      {provider !== 'azure' &&
+                      {(provider === 'aws' || provider === 'gcp') &&
                         <Button
                           className={`${buttonClassName} w-16`}
                           onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
