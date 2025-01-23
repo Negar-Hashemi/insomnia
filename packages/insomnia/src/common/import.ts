@@ -19,6 +19,7 @@ import { isWorkspace, type Workspace } from '../models/workspace';
 import type { CurrentPlan } from '../ui/routes/organization';
 import { convert, type InsomniaImporter } from '../utils/importers/convert';
 import { id as postmanEnvImporterId } from '../utils/importers/importers/postman-env';
+import { flattenWsdl } from '../utils/importers/importers/wsdl';
 import { invariant } from '../utils/invariant';
 import { database as db } from './database';
 import { generateId } from './misc';
@@ -71,6 +72,7 @@ export async function fetchImportContentFromURI({ uri }: { uri: string }) {
 export interface ImportFileDetail {
   contentStr: string;
   oriFileName: string;
+  oriFilePath?: string;
 }
 
 export interface PostmanDataDumpRawData {
@@ -119,12 +121,24 @@ let resourceCacheList: ResourceCacheType[] = [];
 export async function scanResources(contentList: string[] | ImportFileDetail[]): Promise<ScanResult[]> {
   resourceCacheList = [];
   const results = await Promise.allSettled(contentList.map(async content => {
-    const contentStr = typeof content === 'string' ? content : content.contentStr;
+    let contentStr = typeof content === 'string' ? content : content.contentStr;
     const oriFileName = typeof content === 'string' ? '' : content.oriFileName;
 
     let result: ConvertResult | null = null;
 
     try {
+      if (oriFileName.toLowerCase().endsWith('.wsdl')) {
+        let oriFilePath = '';
+        if (typeof content === 'object' && content.oriFilePath) {
+          oriFilePath = content.oriFilePath;
+        }
+        if (oriFilePath) {
+          // Try to find referenced files in the WSDL file and merge them into the main file
+          try {
+            contentStr = await flattenWsdl(contentStr, oriFilePath);
+          } catch (err) { }
+        }
+      }
       result = (await convert(contentStr)) as unknown as ConvertResult;
     } catch (err: unknown) {
       if (err instanceof Error) {
