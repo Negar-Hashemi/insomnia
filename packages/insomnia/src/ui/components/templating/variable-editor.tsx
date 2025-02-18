@@ -80,6 +80,22 @@ export const VariableEditor: FC<Props> = ({ onChange, defaultValue }) => {
         </div>
       )}
       <div className="form-control form-control--outlined">
+        {isVaultVariable &&
+          <button
+            type="button"
+            style={{
+              zIndex: 10,
+              position: 'relative',
+            }}
+            className="txt-sm pull-right icon inline-block"
+            onClick={() => setPurpose(prevPurpose => prevPurpose === '' ? 'preview' : '')}
+          >
+            {purpose === '' ?
+              <i className="fa-regular fa-eye" /> :
+              <i className="fa-regular fa-eye-slash" />
+            }
+          </button>
+        }
         <label>
           Live Preview
           <textarea className={`${error ? 'danger' : ''}`} value={preview || error} readOnly />
