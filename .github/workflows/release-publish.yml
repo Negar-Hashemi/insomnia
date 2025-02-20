@@ -65,10 +65,13 @@ jobs:
         uses: robinraju/release-downloader@v1
         with:
           repository: 'kong/insomnia-ee'
-          # latest: true
-          tag: core@$RELEASE_VERSION
+          tag: core@${{ env.RELEASE_VERSION }}
           fileName: '*'
           token: ${{ secrets.EE_DOWNLOAD_TOKEN }}
+
+      - name: Debug downloaded artifacts
+        run: ls -lah
+
 
       # - name: Set publish metadata # Checksum for provenance must be calculated before moving artifacts temporarily
       #   id: metadata
