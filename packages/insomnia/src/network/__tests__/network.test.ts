@@ -140,7 +140,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('sends a urlencoded', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -213,7 +215,9 @@ describe('sendCurlAndWriteTimeline()', () => {
      },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('skips sending and storing cookies with setting', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -317,7 +321,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('sends a file', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -384,7 +390,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('sends multipart form data', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -480,7 +488,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('uses unix socket', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -524,7 +534,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('uses works with HEAD', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -567,7 +579,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('uses works with "unix" host', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -610,7 +624,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('uses netrc', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
@@ -655,7 +671,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('disables ssl verification when configured to do so', async () => {
     if (process.platform === 'darwin') {
       // skipped this test, due to SSL_VERIFYHOST being disabled for MacOS on libcurl-promise.ts
@@ -774,7 +792,9 @@ describe('sendCurlAndWriteTimeline()', () => {
       },
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   it('sets HTTP version', async () => {
     const workspace = await models.workspace.create();
     const settings = await models.settings.getOrCreate();
