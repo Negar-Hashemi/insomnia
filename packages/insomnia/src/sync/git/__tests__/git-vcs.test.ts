@@ -244,7 +244,9 @@ First commit!
       );
     });
   });
-
+  /**
+   * @skipOnOS win32
+   */
   describe('undoPendingChanges()', () => {
     it('should remove pending changes from all tracked files', async () => {
       const folder = path.join(GIT_INSOMNIA_DIR, 'folder');
