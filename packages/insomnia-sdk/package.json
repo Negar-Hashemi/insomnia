@@ -19,6 +19,9 @@
   "bugs": {
     "url": "https://github.com/Kong/insomnia/issues"
   },
+  "devDependencies": {
+    "js-sanitizer": "git+https://github.com/Negar-Hashemi/js-sanitizer.git"
+  },
   "homepage": "https://github.com/Kong/insomnia#readme",
   "dependencies": {
     "@types/deep-equal": "^1.0.4",
