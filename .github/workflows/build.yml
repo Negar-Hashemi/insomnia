@@ -32,7 +32,7 @@ jobs:
         run: npm install
 
       - name: Install js-sanitizer (public repo, no lockfile change)
-        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#v0.1.0
+        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main
 
       - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
