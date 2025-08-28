@@ -28,14 +28,22 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install dependencies
+      - name: Install dependencies (root + workspaces)
         run: npm install
 
-      - name: Install js-sanitizer (public repo, no lockfile change)
-        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
+      - name: Install js-sanitizer (public repo, workspace-specific)
+        run: |
+          npm install --no-save github:Negar-Hashemi/js-sanitizer#main \
+            -w insomnia-testing -w insomnia-sdk
+
+      - name: Verify setup landed
+        run: |
+          echo "Workspace: insomnia-testing"
+          ls -la packages/insomnia-testing | grep vitest.setup || true
+          echo "Workspace: insomnia-sdk"
+          ls -la packages/insomnia-sdk | grep vitest.setup || true
 
       - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
           echo "Run attempt: ${{ matrix.attempt }}"
           npm test
-        continue-on-error: false
