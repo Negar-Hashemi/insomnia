@@ -32,7 +32,7 @@ jobs:
         run: npm install
 
       - name: Install js-sanitizer (public repo, no lockfile change)
-        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main
+        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
 
       - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
