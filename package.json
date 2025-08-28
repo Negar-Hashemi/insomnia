@@ -41,7 +41,6 @@
     "download-all-npm-plugins": "esr ./scripts/download-all-npm-plugins.ts"
   },
   "devDependencies": {
-    "js-sanitizer": "git+https://github.com/Negar-Hashemi/js-sanitizer.git",
     "@types/chai": "^4.3.14",
     "@types/eslint": "^8.56.7",
     "@types/har-format": "^1.2.15",
