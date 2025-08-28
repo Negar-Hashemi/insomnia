@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies (root + workspaces)
         run: npm install
 
-      # Install sanitizer into the two workspaces (Windows-safe: single line, no backslash)
+      # Install sanitizer into the two workspaces (single line so Windows PowerShell is happy)
       - name: Install js-sanitizer (workspace-scoped)
         run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
 
@@ -42,27 +42,44 @@ jobs:
         working-directory: packages/insomnia-sdk
         run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
 
-      # Run setup in insomnia-testing, forcing ROOT to the workspace
-      - name: Run js-sanitizer setup (insomnia-testing)
+      # ---------- Run js-sanitizer setup in each workspace ----------
+      # Linux / macOS: use bash; force INIT_CWD for correct ROOT; bypass "exports" using require.resolve
+      - name: Run js-sanitizer setup (insomnia-testing) [bash]
+        if: runner.os != 'Windows'
+        working-directory: packages/insomnia-testing
+        shell: bash
+        run: |
+          INIT_CWD="${{ github.workspace }}/packages/insomnia-testing" node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
+          [ -f ./vitest.setup.js ] || { echo 'vitest.setup.js ✗ missing'; exit 1; }
+
+      - name: Run js-sanitizer setup (insomnia-sdk) [bash]
+        if: runner.os != 'Windows'
+        working-directory: packages/insomnia-sdk
+        shell: bash
+        run: |
+          INIT_CWD="${{ github.workspace }}/packages/insomnia-sdk" node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
+          [ -f ./vitest.setup.js ] || { echo 'vitest.setup.js ✗ missing'; exit 1; }
+
+      # Windows: use PowerShell; set $Env:INIT_CWD before node; same resolver trick
+      - name: Run js-sanitizer setup (insomnia-testing) [Windows]
+        if: runner.os == 'Windows'
         working-directory: packages/insomnia-testing
         shell: pwsh
-        env:
-          INIT_CWD: ${{ github.workspace }}/packages/insomnia-testing
         run: |
+          $Env:INIT_CWD = "${{ github.workspace }}/packages/insomnia-testing"
           node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
           if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
-      # Run setup in insomnia-sdk, forcing ROOT to the workspace
-      - name: Run js-sanitizer setup (insomnia-sdk)
+      - name: Run js-sanitizer setup (insomnia-sdk) [Windows]
+        if: runner.os == 'Windows'
         working-directory: packages/insomnia-sdk
         shell: pwsh
-        env:
-          INIT_CWD: ${{ github.workspace }}/packages/insomnia-sdk
         run: |
+          $Env:INIT_CWD = "${{ github.workspace }}/packages/insomnia-sdk"
           node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
           if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
-      # Run the tests on all OS/attempts
+      # ---------- Run tests ----------
       - name: Testing on OS (${{ matrix.os }}) / Node ${{ matrix['node-version'] }} attempt ${{ matrix.attempt }}
         run: |
           echo "Run attempt: ${{ matrix.attempt }}"
