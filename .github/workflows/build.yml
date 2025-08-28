@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [20]
-        attempt: [1,2,3,4,5,6,7,8,9,10]
+        attempt: [1]
 
     steps:
       - uses: actions/checkout@v3
@@ -37,16 +37,47 @@ jobs:
         working-directory: packages/insomnia-sdk
         run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
 
-      # --- Hard guarantee: create vitest.setup.js in both workspaces ---
-      - name: Ensure vitest.setup.js (insomnia-testing)
+      # --- Create vitest.setup.js (Linux/macOS) ---
+      - name: Ensure vitest.setup.js (insomnia-testing) [bash]
+        if: runner.os != 'Windows'
         working-directory: packages/insomnia-testing
+        shell: bash
         run: |
-          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CItry { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}`, 'utf8')"
+          cat > vitest.setup.js <<'EOF'
+          // created by CI
+          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
+          EOF
 
-      - name: Ensure vitest.setup.js (insomnia-sdk)
+      - name: Ensure vitest.setup.js (insomnia-sdk) [bash]
+        if: runner.os != 'Windows'
         working-directory: packages/insomnia-sdk
+        shell: bash
         run: |
-          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CItry { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}`, 'utf8')"
+          cat > vitest.setup.js <<'EOF'
+          // created by CI
+          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
+          EOF
+
+      # --- Create vitest.setup.js (Windows) ---
+      - name: Ensure vitest.setup.js (insomnia-testing) [Windows]
+        if: runner.os == 'Windows'
+        working-directory: packages/insomnia-testing
+        shell: pwsh
+        run: |
+          @"
+          // created by CI
+          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
+          "@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
+
+      - name: Ensure vitest.setup.js (insomnia-sdk) [Windows]
+        if: runner.os == 'Windows'
+        working-directory: packages/insomnia-sdk
+        shell: pwsh
+        run: |
+          @"
+          // created by CI
+          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
+          "@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
 
       # --- Prevent ENOENT on Windows ---
       - name: Create D:\tmp for Windows-only tests
