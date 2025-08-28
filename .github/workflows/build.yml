@@ -2,11 +2,9 @@ name: Test on Multiple OS
 
 on:
   push:
-    branches:
-      - develop
+    branches: [develop]
   pull_request:
-    branches:
-      - develop
+    branches: [develop]
 
 jobs:
   build:
@@ -17,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [20]
-        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        attempt: [1,2,3,4,5,6,7,8,9,10]
 
     steps:
       - name: Checkout code
@@ -31,39 +29,35 @@ jobs:
       - name: Install dependencies (root + workspaces)
         run: npm install
 
-      - name: Install js-sanitizer into target workspaces
-        run: |
-          npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
+      # Install js-sanitizer into the two workspaces (single line => PowerShell-safe)
+      - name: Install js-sanitizer (workspace-scoped)
+        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
 
-      # Explicitly run the setup inside each workspace (works even if postinstall didn't fire)
+      # Ensure Babel can parse TS and load via Vite (so sanitizer sees tags)
+      - name: Ensure Babel deps (insomnia-testing)
+        working-directory: packages/insomnia-testing
+        run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
+
+      - name: Ensure Babel deps (insomnia-sdk)
+        working-directory: packages/insomnia-sdk
+        run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
+
+      # Run setup using Node resolver (works even if js-sanitizer is hoisted)
       - name: Run js-sanitizer setup (insomnia-testing)
         working-directory: packages/insomnia-testing
-        shell: bash
+        shell: pwsh
         run: |
-          node node_modules/js-sanitizer/setup.js || true
-          # if still missing (e.g., setup exited early), create a minimal file to satisfy Vitest
-          if [ ! -f vitest.setup.js ]; then
-            echo "// fallback auto-generated for CI try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}" > vitest.setup.js
-          fi
+          node -e "require('js-sanitizer/setup.js')"
+          if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
       - name: Run js-sanitizer setup (insomnia-sdk)
         working-directory: packages/insomnia-sdk
-        shell: bash
+        shell: pwsh
         run: |
-          node node_modules/js-sanitizer/setup.js || true
-          if [ ! -f vitest.setup.js ]; then
-            echo "// fallback auto-generated for CI try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}" > vitest.setup.js
-          fi
+          node -e "require('js-sanitizer/setup.js')"
+          if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
-      - name: Verify setup landed
-        run: |
-          echo "Workspace: insomnia-testing"
-          test -f packages/insomnia-testing/vitest.setup.js && echo "✓ found" || (echo "✗ missing" && exit 1)
-          echo "Workspace: insomnia-sdk"
-          test -f packages/insomnia-sdk/vitest.setup.js && echo "✓ found" || (echo "✗ missing" && exit 1)
-
-
-      - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
+      - name: Testing on OS (${{ matrix.os }}) / Node ${{ matrix['node-version'] }} attempt ${{ matrix.attempt }}
         run: |
           echo "Run attempt: ${{ matrix.attempt }}"
           npm test
