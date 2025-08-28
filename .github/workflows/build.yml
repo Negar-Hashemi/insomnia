@@ -38,6 +38,7 @@ jobs:
       # Explicitly run the setup inside each workspace (works even if postinstall didn't fire)
       - name: Run js-sanitizer setup (insomnia-testing)
         working-directory: packages/insomnia-testing
+        shell: bash
         run: |
           node node_modules/js-sanitizer/setup.js || true
           # if still missing (e.g., setup exited early), create a minimal file to satisfy Vitest
@@ -47,6 +48,7 @@ jobs:
 
       - name: Run js-sanitizer setup (insomnia-sdk)
         working-directory: packages/insomnia-sdk
+        shell: bash
         run: |
           node node_modules/js-sanitizer/setup.js || true
           if [ ! -f vitest.setup.js ]; then
