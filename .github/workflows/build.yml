@@ -26,27 +26,24 @@ jobs:
       - name: Install dependencies (root + workspaces)
         run: npm install
 
-      - name: Install js-sanitizer into workspaces
-        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
+      # Install js-sanitizer ONLY where you need tag-skips
+      - name: Install js-sanitizer (insomnia-testing only)
+        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing
 
+      # If you rely on sanitizer tags in insomnia-testing TS tests, keep these deps there
       - name: Ensure Babel deps (insomnia-testing)
         working-directory: packages/insomnia-testing
         run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
 
-      - name: Ensure Babel deps (insomnia-sdk)
-        working-directory: packages/insomnia-sdk
-        run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
-
-      # --- Create vitest.setup.js (Linux/macOS) ---
+      # --- Create MINIMAL vitest.setup.js (no babel/register) ---
       - name: Ensure vitest.setup.js (insomnia-testing) [bash]
         if: runner.os != 'Windows'
         working-directory: packages/insomnia-testing
         shell: bash
         run: |
           cat > vitest.setup.js <<'EOF'
-          // created by CI
-          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-          EOF
+// created by CI (minimal); no babel/register
+EOF
 
       - name: Ensure vitest.setup.js (insomnia-sdk) [bash]
         if: runner.os != 'Windows'
@@ -54,32 +51,24 @@ jobs:
         shell: bash
         run: |
           cat > vitest.setup.js <<'EOF'
-          // created by CI
-          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-          EOF
+// created by CI (minimal); no babel/register
+EOF
 
-      # --- Create vitest.setup.js (Windows) ---
       - name: Ensure vitest.setup.js (insomnia-testing) [Windows]
         if: runner.os == 'Windows'
         working-directory: packages/insomnia-testing
         shell: pwsh
         run: |
-          @"
-          // created by CI
-          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-          "@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
+          @"// created by CI (minimal); no babel/register"@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
 
       - name: Ensure vitest.setup.js (insomnia-sdk) [Windows]
         if: runner.os == 'Windows'
         working-directory: packages/insomnia-sdk
         shell: pwsh
         run: |
-          @"
-          // created by CI
-          try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-          "@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
+          @"// created by CI (minimal); no babel/register"@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
 
-      # --- Prevent ENOENT on Windows ---
+      # --- Prevent ENOENT on Windows for that test path assumption ---
       - name: Create D:\tmp for Windows-only tests
         if: runner.os == 'Windows'
         shell: pwsh
