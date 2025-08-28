@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -29,11 +28,11 @@ jobs:
       - name: Install dependencies (root + workspaces)
         run: npm install
 
-      # Install js-sanitizer into the two workspaces (single line => PowerShell-safe)
+      # Install sanitizer into the two workspaces (one line => PowerShell-safe)
       - name: Install js-sanitizer (workspace-scoped)
         run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
 
-      # Ensure Babel can parse TS and load via Vite (so sanitizer sees tags)
+      # Ensure Babel can parse TS so sanitizer tags apply to .ts tests
       - name: Ensure Babel deps (insomnia-testing)
         working-directory: packages/insomnia-testing
         run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
@@ -42,19 +41,19 @@ jobs:
         working-directory: packages/insomnia-sdk
         run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
 
-      # Run setup using Node resolver (works even if js-sanitizer is hoisted)
+      # Run setup with a resolver that bypasses "exports"
       - name: Run js-sanitizer setup (insomnia-testing)
         working-directory: packages/insomnia-testing
         shell: pwsh
         run: |
-          node -e "require('js-sanitizer/setup.js')"
+          node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
           if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
       - name: Run js-sanitizer setup (insomnia-sdk)
         working-directory: packages/insomnia-sdk
         shell: pwsh
         run: |
-          node -e "require('js-sanitizer/setup.js')"
+          node -e "const fs=require('fs');const path=require('path');const base=require.resolve('js-sanitizer');const dir=path.dirname(base);const cand=['setup.js','setup.cjs','dist/setup.js','dist/setup.cjs'].map(f=>path.join(dir,f));const hit=cand.find(f=>{try{fs.accessSync(f);return true}catch{}});if(!hit)throw new Error('js-sanitizer setup file not found near '+dir);require(hit)"
           if (Test-Path ./vitest.setup.js) { 'vitest.setup.js ✓' } else { throw 'vitest.setup.js ✗ missing' }
 
       - name: Testing on OS (${{ matrix.os }}) / Node ${{ matrix['node-version'] }} attempt ${{ matrix.attempt }}
