@@ -33,8 +33,7 @@ jobs:
 
       - name: Install js-sanitizer into target workspaces
         run: |
-          npm install --no-save github:Negar-Hashemi/js-sanitizer#main \
-            -w insomnia-testing -w insomnia-sdk
+          npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing -w insomnia-sdk
 
       # Explicitly run the setup inside each workspace (works even if postinstall didn't fire)
       - name: Run js-sanitizer setup (insomnia-testing)
