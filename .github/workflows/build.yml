@@ -41,16 +41,12 @@ jobs:
       - name: Ensure vitest.setup.js (insomnia-testing)
         working-directory: packages/insomnia-testing
         run: |
-          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CI
-try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-`, 'utf8')"
+          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CItry { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}`, 'utf8')"
 
       - name: Ensure vitest.setup.js (insomnia-sdk)
         working-directory: packages/insomnia-sdk
         run: |
-          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CI
-try { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}
-`, 'utf8')"
+          node -e "require('fs').writeFileSync('vitest.setup.js', `// created by CItry { require('@babel/register')({ extensions: ['.js','.jsx','.ts','.tsx'], cache: true }); } catch {}`, 'utf8')"
 
       # --- Prevent ENOENT on Windows ---
       - name: Create D:\tmp for Windows-only tests
