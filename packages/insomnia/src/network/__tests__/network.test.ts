@@ -23,6 +23,9 @@ import { getSetCookiesFromResponseHeaders } from '../network';
 
 const getRenderedRequest = async (args: Parameters<typeof getRenderedRequestAndContext>[0]) => (await getRenderedRequestAndContext(args)).request;
 
+/**
+* @skipOnOS win32
+*/
 describe('sendCurlAndWriteTimeline()', () => {
   beforeEach(async () => {
     await models.project.all();
