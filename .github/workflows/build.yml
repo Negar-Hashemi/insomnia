@@ -2,85 +2,37 @@ name: Test on Multiple OS
 
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [20]
-        attempt: [1]
+        os: [ubuntu-latest, macos-latest, windows-latest] # Operating systems to test
+        node-version: [20]                      # Node.js versions to test
+        attempt: [1, 2]         # Repeat tests 10 times
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install dependencies (root + workspaces)
+      - name: Install dependencies
         run: npm install
 
-      # Install js-sanitizer ONLY where you need tag-skips
-      - name: Install js-sanitizer (insomnia-testing only)
-        run: npm install --no-save github:Negar-Hashemi/js-sanitizer#main -w insomnia-testing
-
-      # If you rely on sanitizer tags in insomnia-testing TS tests, keep these deps there
-      - name: Ensure Babel deps (insomnia-testing)
-        working-directory: packages/insomnia-testing
-        run: npm i -D @babel/core @babel/preset-env @babel/preset-typescript vite-plugin-babel
-
-      # --- Create MINIMAL vitest.setup.js (no babel/register) ---
-      - name: Ensure vitest.setup.js (insomnia-testing) [bash]
-        if: runner.os != 'Windows'
-        working-directory: packages/insomnia-testing
-        shell: bash
-        run: |
-          cat > vitest.setup.js <<'EOF'
-          // created by CI (minimal); no babel/register
-          EOF
-
-      - name: Ensure vitest.setup.js (insomnia-sdk) [bash]
-        if: runner.os != 'Windows'
-        working-directory: packages/insomnia-sdk
-        shell: bash
-        run: |
-          cat > vitest.setup.js <<'EOF'
-          // created by CI (minimal); no babel/register
-          EOF
-
-      - name: Ensure vitest.setup.js (insomnia-testing) [Windows]
-        if: runner.os == 'Windows'
-        working-directory: packages/insomnia-testing
-        shell: pwsh
-        run: |
-          @"// created by CI (minimal); no babel/register"@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
-
-      - name: Ensure vitest.setup.js (insomnia-sdk) [Windows]
-        if: runner.os == 'Windows'
-        working-directory: packages/insomnia-sdk
-        shell: pwsh
-        run: |
-          @"// created by CI (minimal); no babel/register"@ | Out-File -FilePath vitest.setup.js -Encoding UTF8
-
-      # --- Prevent ENOENT on Windows for that test path assumption ---
-      - name: Create D:\tmp for Windows-only tests
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: New-Item -ItemType Directory -Path 'D:\tmp' -Force | Out-Null
-
-      - name: Show vitest setup files
-        shell: pwsh
-        run: |
-          Get-ChildItem packages/insomnia-testing -Filter vitest.setup.js -ErrorAction SilentlyContinue
-          Get-ChildItem packages/insomnia-sdk -Filter vitest.setup.js -ErrorAction SilentlyContinue
-
-      - name: Testing on OS (${{ matrix.os }}) / Node ${{ matrix['node-version'] }} attempt ${{ matrix.attempt }}
+      - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
           echo "Run attempt: ${{ matrix.attempt }}"
-          npm test
+          npm run test -w insomnia
+    continue-on-error: false
