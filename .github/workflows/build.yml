@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          npm install vitest
+          npm install vitest@2.0.4
 
       - name: Install js-sanitizer
         run: npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git
