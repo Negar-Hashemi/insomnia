@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: ./insomnia
 
     strategy:
       fail-fast: false
@@ -32,10 +35,10 @@ jobs:
         run: npm install
 
       - name: Install js-sanitizer
-        run: npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git -w insomnia
+        run: npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git
 
       - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
           echo "Run attempt: ${{ matrix.attempt }}"
-          npm run test -w insomnia
+          npm run test
     continue-on-error: false
