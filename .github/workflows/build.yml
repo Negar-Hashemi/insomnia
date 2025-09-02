@@ -34,7 +34,7 @@ jobs:
       - name: Install js-sanitizer
         run: |
           npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git
-          npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git -w insomnia
+          npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git --workspaces
 
       - name: Testing on OS (${{ matrix.os }}) with Node.js (version ${{ matrix.node-version }}) attempt ${{ matrix.attempt }}
         run: |
