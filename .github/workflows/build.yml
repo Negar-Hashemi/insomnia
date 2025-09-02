@@ -32,7 +32,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install vitest
 
       - name: Install js-sanitizer
         run: npm i --save-dev git+https://github.com/Negar-Hashemi/js-sanitizer.git
